@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Рапорт о изменении звания</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="logo">
+            <!-- Сюда можно вставить логотип -->
+            <h1>41-Й ЭЛИТНЫЙ РАЗВЕДЫВАТЕЛЬНЫЙ КОРПУС</h1>
+            <p>ПОРТАЛ СЛУЖЕБНЫХ РАПОРТОВ</p>
+        </div>
+    </header>
+
+    <main class="report-form-container">
+        <form id="reportForm">
+            <h2>Рапорт о изменении звания</h2>
+            <p>На случай отказа Google Forms. Данные уходят напрямую командованию.</p>
+
+            <div class="form-group">
+                <label for="reporting">Докладывает *</label>
+                <input type="text" id="reporting" name="reporting" placeholder="Номер | Позывной | Звание" required>
+            </div>
+
+            <div class="form-group">
+                <label for="issuedBy">Кто выдал форму *</label>
+                <input type="text" id="issuedBy" name="issuedBy" placeholder="Номер | Позывной | Звание" required>
+            </div>
+
+            <div class="form-group">
+                <label for="reportType">Тип рапорта *</label>
+                <input type="text" id="reportType" name="reportType" value="Вступление в 41-й" required>
+            </div>
+
+            <div class="form-group">
+                <label for="soldierInfo">Н | П бойца *</label>
+                <input type="text" id="soldierInfo" name="soldierInfo" placeholder="Номер | Позывной" required>
+            </div>
+
+            <div class="form-group">
+                <label for="oldRank">Старое звание *</label>
+                <input type="text" id="oldRank" name="oldRank" value="Кадет" required>
+            </div>
+
+            <div class="form-group">
+                <label for="newRank">Новое звание *</label>
+                <input type="text" id="newRank" name="newRank" value="Рядовой-рекрут" required>
+            </div>
+
+            <div class="form-group">
+                <label for="steamId">SteamID *</label>
+                <input type="text" id="steamId" name="steamId" placeholder="765611980xxxxxxxx" required>
+            </div>
+
+            <div class="form-group">
+                <label for="reportDate">Дата рапорта *</label>
+                <input type="date" id="reportDate" name="reportDate" required>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit">ОТПРАВИТЬ РАПОРТ</button>
+                <button type="reset">СБРОСИТЬ</button>
+            </div>
+            <div id="formStatus" class="form-status"></div>
+        </form>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
