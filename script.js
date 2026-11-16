@@ -1,4 +1,4 @@
-// Вставлен ваш тестовый вебхук
+// Ваш тестовый вебхук (не забудьте заменить на боевой, когда всё будет готово)
 const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1571627519638114334/Lg_zk96gkUTrxQBCAm7giIxoIqIySg8GpTGZtdgTuOSJsp1K1G5Crd_prZ4U_xgy91_G';
 const STORAGE_KEY = 'last_report_message_id';
 
@@ -22,19 +22,14 @@ document.getElementById('reportForm').addEventListener('submit', async function(
         reportDate: form.reportDate.value,
     };
 
-    // --- ШАГ 1: УДАЛЕНИЕ СТАРОГО РАПОРТА (ТОЛЬКО ЕСЛИ ВЫБРАНО "ИСПРАВЛЕНИЕ") ---
+    // --- ШАГ 1: УДАЛЕНИЕ СТАРОГО РАПОРТА (ТОЛЬКО ПРИ ИСПРАВЛЕНИИ) ---
     if (formData.reportType === 'ИСПРАВЛЕНИЕ') {
         const lastMessageId = localStorage.getItem(STORAGE_KEY);
         if (lastMessageId) {
             statusDiv.textContent = 'Удаление предыдущего рапорта...';
             try {
                 const deleteUrl = `${DISCORD_WEBHOOK_URL}/messages/${lastMessageId}`;
-                const deleteResponse = await fetch(deleteUrl, { method: 'DELETE' });
-
-                if (!deleteResponse.ok && deleteResponse.status !== 404) {
-                    console.warn('Не удалось удалить старое сообщение.');
-                }
-                // Очищаем память от старого ID
+                await fetch(deleteUrl, { method: 'DELETE' });
                 localStorage.removeItem(STORAGE_KEY);
             } catch (error) {
                 console.error('Ошибка при удалении:', error);
@@ -42,22 +37,63 @@ document.getElementById('reportForm').addEventListener('submit', async function(
         }
     }
 
-    // --- ШАГ 2: ОТПРАВЛЯЕМ НОВЫЙ РАПОРТ ---
+    // --- ШАГ 2: ФОРМИРОВАНИЕ НОВОГО РАПОРТА ---
     const isCorrection = formData.reportType === 'ИСПРАВЛЕНИЕ';
 
+    // Формируем payload с дизайном как на скриншоте
     const payload = {
         username: "Канцелярия 41-го ЭРК",
+        avatar_url: "https://i.imgur.com/your-logo.png", // Можете вставить ссылку на логотип корпуса
         embeds: [{
-            title: isCorrection ? "🚨 ИСПРАВЛЕННЫЙ РАПОРТ" : "Рапорт о изменении звания",
-            color: isCorrection ? 16711680 : 16711935, // Красный для исправления, розовый для нового
-            description: `**Докладывает:**\n${formData.reporting}\n\n**Кто выдал форму:**\n${formData.issuedBy}`,
+            title: isCorrection ? "📝 ИСПРАВЛЕНИЕ РАПОРТА." : "📝 Рапорт о изменении звания.",
+            color: 9109504, // Темно-красный цвет полоски (Hex: #8B0000)
+            description: "📌 **Основные данные**", // Заголовок секции
             fields: [
-                { name: "Тип рапорта", value: formData.reportType, inline: true },
-                { name: "Н | П бойца", value: formData.soldierInfo, inline: true },
-                { name: "Старое звание → Новое звание", value: `[${formData.oldRank}] → [${formData.newRank}]`, inline: false },
-                { name: "SteamID", value: formData.steamId, inline: false },
-                { name: "Дата рапорта", value: formData.reportDate, inline: true }
+                // Используем inline: false, чтобы поля шли друг под другом
+                { 
+                    name: "Докладывает:", 
+                    value: `\`${formData.reporting}\``, 
+                    inline: false 
+                },
+                { 
+                    name: "Кто выдал форму:", 
+                    value: `\`${formData.issuedBy}\``, 
+                    inline: false 
+                },
+                { 
+                    name: "Тип рапорта:", 
+                    value: `**${formData.reportType}**`, 
+                    inline: false 
+                },
+                { 
+                    name: "Н | П бойца:", 
+                    value: `${formData.soldierInfo}`, 
+                    inline: false 
+                },
+                { 
+                    name: "Изменение звания:", 
+                    // Зачеркиваем старое звание и делаем жирным новое для наглядности
+                    value: `~~${formData.oldRank}~~ ➔ **${formData.newRank}**`, 
+                    inline: false 
+                },
+                { 
+                    name: "SteamID:", 
+                    value: `\`${formData.steamId}\``, 
+                    inline: false 
+                },
+                { 
+                    name: "Дата рапорта:", 
+                    value: `${formData.reportDate}`, 
+                    inline: false 
+                }
             ],
+            // Картинка внизу (как на скриншоте). Замените ссылку на нужную вам.
+            image: {
+                url: "https://i.imgur.com/8Y6jX5b.jpeg" // Пример ссылки на картинку
+            },
+            footer: {
+                text: "Портал служебных рапортов 41-го ЭРК"
+            },
             timestamp: new Date().toISOString()
         }]
     };
@@ -65,9 +101,7 @@ document.getElementById('reportForm').addEventListener('submit', async function(
     try {
         statusDiv.textContent = 'Отправка нового рапорта...';
 
-        // ?wait=true нужен, чтобы Discord вернул ID нового сообщения
         const postUrl = `${DISCORD_WEBHOOK_URL}?wait=true`;
-        
         const response = await fetch(postUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -76,28 +110,17 @@ document.getElementById('reportForm').addEventListener('submit', async function(
 
         if (response.ok) {
             const createdMessage = await response.json();
-            
-            // Всегда сохраняем ID последнего отправленного сообщения
             if (createdMessage.id) {
                 localStorage.setItem(STORAGE_KEY, createdMessage.id);
             }
-
-            // Меняем текст успеха в зависимости от того, было ли это исправление
-            if (isCorrection) {
-                statusDiv.textContent = 'Рапорт успешно исправлен (старый удален)!';
-            } else {
-                statusDiv.textContent = 'Новый рапорт успешно отправлен!';
-            }
-            
+            statusDiv.textContent = 'Рапорт успешно отправлен!';
             statusDiv.classList.add('success');
             form.reset();
         } else {
-            const errorData = await response.json();
-            throw new Error(`Ошибка Discord: ${errorData.message || response.statusText}`);
+            throw new Error('Ошибка при отправке в Discord');
         }
     } catch (error) {
         statusDiv.textContent = `Не удалось отправить рапорт: ${error.message}`;
         statusDiv.classList.add('error');
-        console.error('Ошибка отправки:', error);
     }
 });
