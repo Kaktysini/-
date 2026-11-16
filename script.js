@@ -1,4 +1,4 @@
-// Ваш тестовый вебхук (не забудьте заменить на боевой, когда всё будет готово)
+// Ваш тестовый вебхук
 const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1571627519638114334/Lg_zk96gkUTrxQBCAm7giIxoIqIySg8GpTGZtdgTuOSJsp1K1G5Crd_prZ4U_xgy91_G';
 const STORAGE_KEY = 'last_report_message_id';
 
@@ -40,57 +40,28 @@ document.getElementById('reportForm').addEventListener('submit', async function(
     // --- ШАГ 2: ФОРМИРОВАНИЕ НОВОГО РАПОРТА ---
     const isCorrection = formData.reportType === 'ИСПРАВЛЕНИЕ';
 
-    // Формируем payload с дизайном как на скриншоте
     const payload = {
         username: "Канцелярия 41-го ЭРК",
-        avatar_url: "https://i.imgur.com/your-logo.png", // Можете вставить ссылку на логотип корпуса
+        avatar_url: "https://i.imgur.com/your-logo.png", // Логотип бота
         embeds: [{
             title: isCorrection ? "📝 ИСПРАВЛЕНИЕ РАПОРТА." : "📝 Рапорт о изменении звания.",
-            color: 9109504, // Темно-красный цвет полоски (Hex: #8B0000)
-            description: "📌 **Основные данные**", // Заголовок секции
-            fields: [
-                // Используем inline: false, чтобы поля шли друг под другом
-                { 
-                    name: "Докладывает:", 
-                    value: `\`${formData.reporting}\``, 
-                    inline: false 
-                },
-                { 
-                    name: "Кто выдал форму:", 
-                    value: `\`${formData.issuedBy}\``, 
-                    inline: false 
-                },
-                { 
-                    name: "Тип рапорта:", 
-                    value: `**${formData.reportType}**`, 
-                    inline: false 
-                },
-                { 
-                    name: "Н | П бойца:", 
-                    value: `${formData.soldierInfo}`, 
-                    inline: false 
-                },
-                { 
-                    name: "Изменение звания:", 
-                    // Зачеркиваем старое звание и делаем жирным новое для наглядности
-                    value: `~~${formData.oldRank}~~ ➔ **${formData.newRank}**`, 
-                    inline: false 
-                },
-                { 
-                    name: "SteamID:", 
-                    value: `\`${formData.steamId}\``, 
-                    inline: false 
-                },
-                { 
-                    name: "Дата рапорта:", 
-                    value: `${formData.reportDate}`, 
-                    inline: false 
-                }
-            ],
-            // Картинка внизу (как на скриншоте). Замените ссылку на нужную вам.
-            image: {
-                url: "https://i.imgur.com/8Y6jX5b.jpeg" // Пример ссылки на картинку
+            color: 9109504, // Темно-красный цвет
+            description: "📌 **Основные данные**",
+            
+            // ИЗМЕНЕНИЕ ЗДЕСЬ: Вместо image используем thumbnail для картинки справа
+            thumbnail: {
+                url: "https://i.imgur.com/8Y6jX5b.jpeg" // Ссылка на вашу картинку
             },
+            
+            fields: [
+                { name: "Докладывает:", value: `\`${formData.reporting}\``, inline: false },
+                { name: "Кто выдал форму:", value: `\`${formData.issuedBy}\``, inline: false },
+                { name: "Тип рапорта:", value: `**${formData.reportType}**`, inline: false },
+                { name: "Н | П бойца:", value: `${formData.soldierInfo}`, inline: false },
+                { name: "Изменение звания:", value: `~~${formData.oldRank}~~ ➔ **${formData.newRank}**`, inline: false },
+                { name: "SteamID:", value: `\`${formData.steamId}\``, inline: false },
+                { name: "Дата рапорта:", value: `${formData.reportDate}`, inline: false }
+            ],
             footer: {
                 text: "Портал служебных рапортов 41-го ЭРК"
             },
