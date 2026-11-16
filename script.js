@@ -1,4 +1,4 @@
-// ВАЖНО: Вставьте сюда ваш НОВЫЙ URL вебхука (в кавычках)
+// Вставлен ваш тестовый вебхук
 const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1571627519638114334/Lg_zk96gkUTrxQBCAm7giIxoIqIySg8GpTGZtdgTuOSJsp1K1G5Crd_prZ4U_xgy91_G';
 const STORAGE_KEY = 'last_report_message_id';
 
@@ -22,23 +22,23 @@ document.getElementById('reportForm').addEventListener('submit', async function(
         reportDate: form.reportDate.value,
     };
 
-    // --- ШАГ 1: ПЫТАЕМСЯ УДАЛИТЬ СТАРЫЙ РАПОРТ ---
-    const lastMessageId = localStorage.getItem(STORAGE_KEY);
-    if (lastMessageId) {
-        statusDiv.textContent = 'Удаление предыдущего рапорта...';
-        try {
-            // Отправляем запрос на удаление конкретного сообщения
-            const deleteUrl = `${DISCORD_WEBHOOK_URL}/messages/${lastMessageId}`;
-            const deleteResponse = await fetch(deleteUrl, { method: 'DELETE' });
+    // --- ШАГ 1: УДАЛЕНИЕ СТАРОГО РАПОРТА (ТОЛЬКО ЕСЛИ ВЫБРАНО "ИСПРАВЛЕНИЕ") ---
+    if (formData.reportType === 'ИСПРАВЛЕНИЕ') {
+        const lastMessageId = localStorage.getItem(STORAGE_KEY);
+        if (lastMessageId) {
+            statusDiv.textContent = 'Удаление предыдущего рапорта...';
+            try {
+                const deleteUrl = `${DISCORD_WEBHOOK_URL}/messages/${lastMessageId}`;
+                const deleteResponse = await fetch(deleteUrl, { method: 'DELETE' });
 
-            // Если сообщение уже удалено вручную, Discord вернет ошибку 404 (Не найдено). Это нормально.
-            if (!deleteResponse.ok && deleteResponse.status !== 404) {
-                console.warn('Не удалось удалить старое сообщение.');
+                if (!deleteResponse.ok && deleteResponse.status !== 404) {
+                    console.warn('Не удалось удалить старое сообщение.');
+                }
+                // Очищаем память от старого ID
+                localStorage.removeItem(STORAGE_KEY);
+            } catch (error) {
+                console.error('Ошибка при удалении:', error);
             }
-            // В любом случае очищаем память браузера от старого ID
-            localStorage.removeItem(STORAGE_KEY);
-        } catch (error) {
-            console.error('Ошибка при удалении:', error);
         }
     }
 
@@ -47,8 +47,6 @@ document.getElementById('reportForm').addEventListener('submit', async function(
 
     const payload = {
         username: "Канцелярия 41-го ЭРК",
-        // Ссылку на аватарку можно вставить сюда, если она есть
-        // avatar_url: "https://i.imgur.com/ваша_картинка.png", 
         embeds: [{
             title: isCorrection ? "🚨 ИСПРАВЛЕННЫЙ РАПОРТ" : "Рапорт о изменении звания",
             color: isCorrection ? 16711680 : 16711935, // Красный для исправления, розовый для нового
@@ -67,7 +65,7 @@ document.getElementById('reportForm').addEventListener('submit', async function(
     try {
         statusDiv.textContent = 'Отправка нового рапорта...';
 
-        // ?wait=true - ЭТО ВАЖНО! Без этого Discord не вернет нам ID нового сообщения.
+        // ?wait=true нужен, чтобы Discord вернул ID нового сообщения
         const postUrl = `${DISCORD_WEBHOOK_URL}?wait=true`;
         
         const response = await fetch(postUrl, {
@@ -79,14 +77,20 @@ document.getElementById('reportForm').addEventListener('submit', async function(
         if (response.ok) {
             const createdMessage = await response.json();
             
-            // Сохраняем ID нового сообщения в браузере, чтобы удалить его в следующий раз
+            // Всегда сохраняем ID последнего отправленного сообщения
             if (createdMessage.id) {
                 localStorage.setItem(STORAGE_KEY, createdMessage.id);
             }
 
-            statusDiv.textContent = 'Рапорт успешно отправлен (предыдущий удален)!';
+            // Меняем текст успеха в зависимости от того, было ли это исправление
+            if (isCorrection) {
+                statusDiv.textContent = 'Рапорт успешно исправлен (старый удален)!';
+            } else {
+                statusDiv.textContent = 'Новый рапорт успешно отправлен!';
+            }
+            
             statusDiv.classList.add('success');
-            form.reset(); // Очищаем форму
+            form.reset();
         } else {
             const errorData = await response.json();
             throw new Error(`Ошибка Discord: ${errorData.message || response.statusText}`);
