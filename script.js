@@ -50,7 +50,7 @@ document.getElementById('reportForm').addEventListener('submit', async function(
             
             // ИЗМЕНЕНИЕ ЗДЕСЬ: Вместо image используем thumbnail для картинки справа
             thumbnail: {
-                url: "https://i.imgur.com/8Y6jX5b.jpeg" // Ссылка на вашу картинку
+                url: "https://raw.githubusercontent.com/Kaktysini/raportovanie41/refs/heads/main/image.png" // Ссылка на вашу картинку
             },
             
             fields: [
