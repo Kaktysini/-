@@ -1,5 +1,5 @@
 // ВАЖНО: Замените 'ВАШ_WEBHOOK_URL' на URL, скопированный в Discord
-const DISCORD_WEBHOOK_URL = 'ВАШ_WEBHOOK_URL';
+const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1571627519638114334/Lg_zk96gkUTrxQBCAm7giIxoIqIySg8GpTGZtdgTuOSJsp1K1G5Crd_prZ4U_xgy91_G';
 
 document.getElementById('reportForm').addEventListener('submit', async function(event) {
     event.preventDefault(); // Предотвращаем стандартную отправку формы
