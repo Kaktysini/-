@@ -100,3 +100,15 @@ document.getElementById('reportForm').addEventListener('submit', async function(
         statusDiv.classList.add('error');
     }
 });
+// Логика кнопки "Выйти"
+const logoutBtn = document.getElementById('logoutBtn');
+if (logoutBtn) {
+    logoutBtn.addEventListener('click', () => {
+        auth.signOut().then(() => {
+            // После выхода перенаправляем на страницу логина
+            window.location.href = 'login.html';
+        }).catch((error) => {
+            console.error('Ошибка при выходе:', error);
+        });
+    });
+}
