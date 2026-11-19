@@ -18,9 +18,13 @@ const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/157162751963811433
 
 // Проверка: если не вошел — кидаем на страницу логина
 auth.onAuthStateChanged((user) => {
-    if (!user) window.location.href = 'login.html';
+    if (!user) {
+        console.log("Пользователь не найден, перенаправление на вход...");
+        window.location.href = 'login.html';
+    } else {
+        console.log("Успешный вход! UID:", user.uid);
+    }
 });
-
 document.getElementById('reportForm').addEventListener('submit', async function(event) {
     event.preventDefault();
     const user = auth.currentUser;
