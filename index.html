@@ -9,9 +9,9 @@
 <body>
     <header class="site-header">
         <div class="logo-container">
-            <!-- Сюда можно вставить логотип (img) -->
             <h1>41-Й ЭЛИТНЫЙ РАЗВЕДЫВАТЕЛЬНЫЙ КОРПУС</h1>
             <p>ПОРТАЛ СЛУЖЕБНЫХ РАПОРТОВ</p>
+            <a href="edit.html" style="color: #4caf50; text-decoration: none; font-size: 14px; margin-top: 10px; display: inline-block;">Перейти в мои рапорты ➔</a>
         </div>
     </header>
 
@@ -51,7 +51,6 @@
                     <input type="text" id="steamId" name="steamId" placeholder="765611980xxxxxxxx" required>
                 </div>
 
-                <!-- ВЫПАДАЮЩИЙ СПИСОК: СТАРОЕ ЗВАНИЕ (без тегов) -->
                 <div class="form-group">
                     <label for="oldRank">Старое звание *</label>
                     <select id="oldRank" name="oldRank" required>
@@ -82,7 +81,6 @@
                     </select>
                 </div>
 
-                <!-- ВЫПАДАЮЩИЙ СПИСОК: НОВОЕ ЗВАНИЕ (без тегов) -->
                 <div class="form-group">
                     <label for="newRank">Новое звание *</label>
                     <select id="newRank" name="newRank" required>
@@ -127,5 +125,10 @@
             <div id="formStatus" class="form-status"></div>
         </form>
     </main>
+
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
