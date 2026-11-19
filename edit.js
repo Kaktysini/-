@@ -1,4 +1,3 @@
-// 🔴 ВАШИ КЛЮЧИ (оставьте свои, как есть)
 const firebaseConfig = {
     apiKey: "AIzaSyAOpQ79QMQRjIi5bFk28a_At6j9o6qU",
     authDomain: "raportovanie-41.firebaseapp.com",
@@ -13,15 +12,21 @@ const auth = firebase.auth();
 const db = firebase.firestore();
 const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1571627519638114334/Lg_zk96gkUTrxQBCAm7giIxoIqIySg8GpTGZtdgTuOSJsp1K1G5Crd_prZ4U_xgy91_G';
 
-// Показываем пользователю, что идет проверка
 const listDiv = document.getElementById('reportsList');
 listDiv.innerHTML = '<p>Проверка сессии...</p>';
 
-// Ждем, пока Firebase полностью инициализируется
-auth.authStateReady().then(() => {
-    // Теперь auth.currentUser содержит либо реального пользователя, либо null
-    const user = auth.currentUser;
-    
+// Обертка для ожидания начального состояния аутентификации в compat-версии
+function waitForAuth() {
+    return new Promise((resolve) => {
+        const unsubscribe = auth.onAuthStateChanged((user) => {
+            unsubscribe(); // Отписываемся после первого срабатывания
+            resolve(user);
+        });
+    });
+}
+
+// Запускаем проверку
+waitForAuth().then((user) => {
     if (user) {
         console.log("Сессия подтверждена. UID:", user.uid);
         loadReports(user);
@@ -30,33 +35,25 @@ auth.authStateReady().then(() => {
         window.location.href = 'login.html';
     }
 }).catch((error) => {
-    console.error("Ошибка инициализации Auth:", error);
+    console.error("Ошибка проверки сессии:", error);
     listDiv.innerHTML = `<p style="color: red;">Ошибка: ${error.message}</p>`;
 });
 
 // Функция загрузки рапортов
 async function loadReports(user) {
     listDiv.innerHTML = 'Поиск...';
-
     try {
-        const snapshot = await db.collection('reports')
-            .where('userId', '==', user.uid)
-            .get();
-
+        const snapshot = await db.collection('reports').where('userId', '==', user.uid).get();
         listDiv.innerHTML = '';
         const now = new Date();
         let hasActiveReports = false;
 
         snapshot.forEach(doc => {
             const data = doc.data();
-            
-            // Проверяем, не истек ли срок (7 дней)
             if (data.expires_at && data.expires_at.toDate() > now) {
                 hasActiveReports = true;
-                
                 const card = document.createElement('div');
                 card.style.cssText = 'border: 1px solid #374151; padding: 15px; margin-bottom: 15px; background-color: #1a1e1b; border-radius: 4px;';
-                
                 card.innerHTML = `
                     <p><strong>Боец:</strong> ${data.soldierInfo}</p>
                     <p><strong>Звание:</strong> ${data.oldRank} ➔ ${data.newRank}</p>
@@ -67,60 +64,47 @@ async function loadReports(user) {
             }
         });
 
-        if (!hasActiveReports) {
-            listDiv.innerHTML = '<p>У вас нет активных рапортов.</p>';
-        }
+        if (!hasActiveReports) listDiv.innerHTML = '<p>У вас нет активных рапортов.</p>';
     } catch (error) {
         listDiv.innerHTML = `<p style="color: red;">Ошибка: ${error.message}</p>`;
     }
 }
 
-// Функция редактирования (остается без изменений)
+// Функция редактирования (без изменений)
 window.editReport = async function(reportId) {
     const newRank = prompt("Введите новое звание (например: Рядовой):");
     if (!newRank) return;
-
     try {
         const docRef = db.collection('reports').doc(reportId);
         await docRef.update({ newRank: newRank });
-        
         const docSnap = await docRef.get();
         const data = docSnap.data();
-        const messageId = data.discordMessageId;
-        
-        if (messageId) {
-            const payload = {
-                embeds: [{
-                    title: "📝 ИСПРАВЛЕНИЕ РАПОРТА (Отредактировано)",
-                    color: 9109504,
-                    fields: [
-                        { name: "Докладывает:", value: `\`${data.reporting}\``, inline: false },
-                        { name: "Н | П бойца:", value: `${data.soldierInfo}`, inline: false },
-                        { name: "Изменение звания:", value: `~~${data.oldRank}~~ ➔ **${newRank}**`, inline: false }
-                    ]
-                }]
-            };
-
-            await fetch(`${DISCORD_WEBHOOK_URL}/messages/${messageId}`, {
+        if (data.discordMessageId) {
+            await fetch(`${DISCORD_WEBHOOK_URL}/messages/${data.discordMessageId}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
+                body: JSON.stringify({
+                    embeds: [{
+                        title: "📝 ИСПРАВЛЕНИЕ РАПОРТА (Отредактировано)",
+                        color: 9109504,
+                        fields: [
+                            { name: "Докладывает:", value: `\`${data.reporting}\``, inline: false },
+                            { name: "Н | П бойца:", value: `${data.soldierInfo}`, inline: false },
+                            { name: "Изменение звания:", value: `~~${data.oldRank}~~ ➔ **${newRank}**`, inline: false }
+                        ]
+                    }]
+                })
             });
         }
-        
         alert('Рапорт успешно обновлен!');
         window.location.reload();
-    } catch (error) {
-        alert('Ошибка: ' + error.message);
-    }
+    } catch (error) { alert('Ошибка: ' + error.message); }
 };
 
 // Кнопка выхода
 const logoutBtn = document.getElementById('logoutBtn');
 if (logoutBtn) {
     logoutBtn.addEventListener('click', () => {
-        auth.signOut().then(() => {
-            window.location.href = 'login.html';
-        });
+        auth.signOut().then(() => window.location.href = 'login.html');
     });
 }
