@@ -1,4 +1,4 @@
-// 🔴 ВАШИ КЛЮЧИ
+// 🔴 ВАШИ КЛЮЧИ (оставьте свои, как есть)
 const firebaseConfig = {
     apiKey: "AIzaSyAOpQ79QMQRjIi5bFk28a_At6j9o6qU",
     authDomain: "raportovanie-41.firebaseapp.com",
@@ -13,33 +13,25 @@ const auth = firebase.auth();
 const db = firebase.firestore();
 const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1571627519638114334/Lg_zk96gkUTrxQBCAm7giIxoIqIySg8GpTGZtdgTuOSJsp1K1G5Crd_prZ4U_xgy91_G';
 
+// Показываем пользователю, что идет проверка
 const listDiv = document.getElementById('reportsList');
-listDiv.innerHTML = '<p>Проверка сессии...</p>'; // Показываем заглушку
+listDiv.innerHTML = '<p>Проверка сессии...</p>';
 
-// Переменная-флаг: это первый ответ от Firebase?
-let isFirstAuthCheck = true;
-
-auth.onAuthStateChanged((user) => {
-    // Если это первый ответ
-    if (isFirstAuthCheck) {
-        isFirstAuthCheck = false; // Снимаем флаг
-        
-        if (user) {
-            // Пользователь есть — загружаем рапорты
-            console.log("Сессия подтверждена. UID:", user.uid);
-            loadReports(user);
-        } else {
-            // Пользователя действительно нет — перенаправляем
-            console.log("Сессия не найдена. Перенаправление на вход.");
-            window.location.href = 'login.html';
-        }
-        return;
-    }
-
-    // Если это уже последующие ответы (например, выход из системы)
-    if (!user) {
+// Ждем, пока Firebase полностью инициализируется
+auth.authStateReady().then(() => {
+    // Теперь auth.currentUser содержит либо реального пользователя, либо null
+    const user = auth.currentUser;
+    
+    if (user) {
+        console.log("Сессия подтверждена. UID:", user.uid);
+        loadReports(user);
+    } else {
+        console.log("Сессия не найдена. Перенаправление на вход.");
         window.location.href = 'login.html';
     }
+}).catch((error) => {
+    console.error("Ошибка инициализации Auth:", error);
+    listDiv.innerHTML = `<p style="color: red;">Ошибка: ${error.message}</p>`;
 });
 
 // Функция загрузки рапортов
@@ -58,8 +50,10 @@ async function loadReports(user) {
         snapshot.forEach(doc => {
             const data = doc.data();
             
+            // Проверяем, не истек ли срок (7 дней)
             if (data.expires_at && data.expires_at.toDate() > now) {
                 hasActiveReports = true;
+                
                 const card = document.createElement('div');
                 card.style.cssText = 'border: 1px solid #374151; padding: 15px; margin-bottom: 15px; background-color: #1a1e1b; border-radius: 4px;';
                 
@@ -81,7 +75,7 @@ async function loadReports(user) {
     }
 }
 
-// Функция редактирования (без изменений)
+// Функция редактирования (остается без изменений)
 window.editReport = async function(reportId) {
     const newRank = prompt("Введите новое звание (например: Рядовой):");
     if (!newRank) return;
