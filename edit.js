@@ -15,31 +15,30 @@ const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/157162751963811433
 const listDiv = document.getElementById('reportsList');
 listDiv.innerHTML = '<p>Проверка сессии...</p>';
 
-// Обертка для ожидания начального состояния аутентификации в compat-версии
-function waitForAuth() {
-    return new Promise((resolve) => {
-        const unsubscribe = auth.onAuthStateChanged((user) => {
-            unsubscribe(); // Отписываемся после первого срабатывания
-            resolve(user);
-        });
-    });
-}
-
-// Запускаем проверку
-waitForAuth().then((user) => {
+// Ждем, пока Firebase инициализируется и восстановит сессию
+auth.onAuthStateChanged((user) => {
     if (user) {
+        // Если пользователь найден (сессия восстановлена) — загружаем рапорты
         console.log("Сессия подтверждена. UID:", user.uid);
         loadReports(user);
     } else {
-        console.log("Сессия не найдена. Перенаправление на вход.");
-        window.location.href = 'login.html';
+        // Если пользователя нет, это может быть первый вызов (null) до восстановления сессии.
+        // Даем Firebase небольшую паузу и проверяем еще раз.
+        console.log("Первый вызов: пользователь null. Проверяем еще раз через 1 секунду...");
+        setTimeout(() => {
+            if (auth.currentUser) {
+                console.log("Сессия восстановлена после задержки. UID:", auth.currentUser.uid);
+                loadReports(auth.currentUser);
+            } else {
+                // Если и после задержки пользователя нет — сессии действительно нет
+                console.error("Сессия не найдена. Перенаправление на вход.");
+                window.location.href = 'login.html';
+            }
+        }, 1000); // Задержка 1 секунда
     }
-}).catch((error) => {
-    console.error("Ошибка проверки сессии:", error);
-    listDiv.innerHTML = `<p style="color: red;">Ошибка: ${error.message}</p>`;
 });
 
-// Функция загрузки рапортов
+// Функция загрузки рапортов (остается без изменений)
 async function loadReports(user) {
     listDiv.innerHTML = 'Поиск...';
     try {
@@ -70,7 +69,7 @@ async function loadReports(user) {
     }
 }
 
-// Функция редактирования (без изменений)
+// Функция редактирования и кнопка выхода (без изменений)
 window.editReport = async function(reportId) {
     const newRank = prompt("Введите новое звание (например: Рядовой):");
     if (!newRank) return;
@@ -101,7 +100,6 @@ window.editReport = async function(reportId) {
     } catch (error) { alert('Ошибка: ' + error.message); }
 };
 
-// Кнопка выхода
 const logoutBtn = document.getElementById('logoutBtn');
 if (logoutBtn) {
     logoutBtn.addEventListener('click', () => {
