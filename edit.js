@@ -1,4 +1,4 @@
-// Ключи Firebase
+// 🔴 ВАШИ КЛЮЧИ
 const firebaseConfig = {
     apiKey: "AIzaSyAOpQ79QMQRjIi5bFk28a_At6j9o6qU",
     authDomain: "raportovanie-41.firebaseapp.com",
@@ -13,27 +13,37 @@ const auth = firebase.auth();
 const db = firebase.firestore();
 const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1571627519638114334/Lg_zk96gkUTrxQBCAm7giIxoIqIySg8GpTGZtdgTuOSJsp1K1G5Crd_prZ4U_xgy91_G';
 
-// 1. Принудительно используем LOCAL режим для надежности
-auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).then(() => {
-    console.log("Режим сохранения сессии: LOCAL");
-    
-    // 2. Запускаем слушатель состояния авторизации
-    auth.onAuthStateChanged((user) => {
+const listDiv = document.getElementById('reportsList');
+listDiv.innerHTML = '<p>Проверка сессии...</p>'; // Показываем заглушку
+
+// Переменная-флаг: это первый ответ от Firebase?
+let isFirstAuthCheck = true;
+
+auth.onAuthStateChanged((user) => {
+    // Если это первый ответ
+    if (isFirstAuthCheck) {
+        isFirstAuthCheck = false; // Снимаем флаг
+        
         if (user) {
-            console.log("Пользователь найден:", user.uid);
+            // Пользователь есть — загружаем рапорты
+            console.log("Сессия подтверждена. UID:", user.uid);
             loadReports(user);
         } else {
-            console.log("Пользователь не найден. Перенаправление на вход.");
+            // Пользователя действительно нет — перенаправляем
+            console.log("Сессия не найдена. Перенаправление на вход.");
             window.location.href = 'login.html';
         }
-    });
-}).catch((error) => {
-    console.error("Ошибка настройки сессии:", error);
+        return;
+    }
+
+    // Если это уже последующие ответы (например, выход из системы)
+    if (!user) {
+        window.location.href = 'login.html';
+    }
 });
 
 // Функция загрузки рапортов
 async function loadReports(user) {
-    const listDiv = document.getElementById('reportsList');
     listDiv.innerHTML = 'Поиск...';
 
     try {
@@ -71,9 +81,44 @@ async function loadReports(user) {
     }
 }
 
-// Функция редактирования (остается без изменений)
+// Функция редактирования (без изменений)
 window.editReport = async function(reportId) {
-    // ... ваш код функции editReport ...
+    const newRank = prompt("Введите новое звание (например: Рядовой):");
+    if (!newRank) return;
+
+    try {
+        const docRef = db.collection('reports').doc(reportId);
+        await docRef.update({ newRank: newRank });
+        
+        const docSnap = await docRef.get();
+        const data = docSnap.data();
+        const messageId = data.discordMessageId;
+        
+        if (messageId) {
+            const payload = {
+                embeds: [{
+                    title: "📝 ИСПРАВЛЕНИЕ РАПОРТА (Отредактировано)",
+                    color: 9109504,
+                    fields: [
+                        { name: "Докладывает:", value: `\`${data.reporting}\``, inline: false },
+                        { name: "Н | П бойца:", value: `${data.soldierInfo}`, inline: false },
+                        { name: "Изменение звания:", value: `~~${data.oldRank}~~ ➔ **${newRank}**`, inline: false }
+                    ]
+                }]
+            };
+
+            await fetch(`${DISCORD_WEBHOOK_URL}/messages/${messageId}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+        }
+        
+        alert('Рапорт успешно обновлен!');
+        window.location.reload();
+    } catch (error) {
+        alert('Ошибка: ' + error.message);
+    }
 };
 
 // Кнопка выхода
