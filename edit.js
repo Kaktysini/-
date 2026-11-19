@@ -16,7 +16,14 @@ const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/157162751963811433
 
 auth.onAuthStateChanged(async (user) => {
     if (!user) {
-        window.location.href = 'login.html';
+        console.log("Проверка сессии...");
+        // Даем Firebase 1 секунду, чтобы восстановить сессию из памяти браузера
+        setTimeout(() => {
+            if (!auth.currentUser) {
+                console.log("Сессия не найдена, выкидываем на вход.");
+                window.location.href = 'login.html';
+            }
+        }, 1000);
         return;
     }
 
