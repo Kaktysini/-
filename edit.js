@@ -1,11 +1,11 @@
 // 🔴 ВСТАВЬТЕ ВАШИ КЛЮЧИ ИЗ FIREBASE СЮДА 🔴
 const firebaseConfig = {
-  apiKey: "AIzaSyAOOP79OWQn_RjiI5bFk28a_At6jJ9o6qU",
-  authDomain: "raportovanie-41.firebaseapp.com",
-  projectId: "raportovanie-41",
-  storageBucket: "raportovanie-41.appspot.com",
-  messagingSenderId: "1097924602121",
-  appId: "1:1097924602121:web:90662309434c46ced9cbd8"
+    apiKey: "AIzaSyAOpQ79QMQRjIi5bFk28a_At6j9o6qU",
+    authDomain: "raportovanie-41.firebaseapp.com",
+    projectId: "raportovanie-41",
+    storageBucket: "raportovanie-41.appspot.com",
+    messagingSenderId: "1097924602121",
+    appId: "1:1097924602121:web:9066230943a4c6c9dcb8"
 };
 // 🔴 КОНЕЦ ВСТАВКИ 🔴
 
@@ -40,7 +40,6 @@ auth.onAuthStateChanged(async (user) => {
         snapshot.forEach(doc => {
             const data = doc.data();
             const card = document.createElement('div');
-            // Применяем стили, чтобы карточки выглядели аккуратно
             card.style.border = '1px solid #374151';
             card.style.padding = '15px';
             card.style.marginBottom = '15px';
@@ -100,12 +99,13 @@ window.editReport = async function(reportId) {
         alert('Ошибка: ' + error.message);
     }
 };
-// Логика кнопки "Выйти" (ВСТАВЛЕННЫЙ КОД)
+
+// Логика кнопки "Выйти"
 const logoutBtn = document.getElementById('logoutBtn');
 if (logoutBtn) {
     logoutBtn.addEventListener('click', () => {
         auth.signOut().then(() => {
-            window.location.href = 'login.html'; // Перенаправляем на вход
+            window.location.href = 'login.html';
         }).catch((error) => {
             console.error('Ошибка при выходе:', error);
         });
