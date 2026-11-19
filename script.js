@@ -1,16 +1,37 @@
-// Ваш тестовый вебхук
+// 🔴 ВСТАВЬТЕ ВАШИ КЛЮЧИ ИЗ FIREBASE СЮДА 🔴
+const firebaseConfig = {
+    apiKey: "AIzaSyAOOP79OWQn_RjiI5bFk28a_At6jJ9o6qU",
+    authDomain: "raportovanie-41.firebaseapp.com",
+    projectId: "raportovanie-41",
+    storageBucket: "raportovanie-41.firebasestorage.app",
+    messagingSenderId: "1097924602121",
+    appId: "1:1097924602121:web:90662309434c46ced9cbd8"
+};
+};
+// 🔴 КОНЕЦ ВСТАВКИ 🔴
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+// Ваш вебхук (оставил ваш тестовый)
 const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1571627519638114334/Lg_zk96gkUTrxQBCAm7giIxoIqIySg8GpTGZtdgTuOSJsp1K1G5Crd_prZ4U_xgy91_G';
-const STORAGE_KEY = 'last_report_message_id';
+
+// Проверка: если не вошел — кидаем на страницу логина
+auth.onAuthStateChanged((user) => {
+    if (!user) window.location.href = 'login.html';
+});
 
 document.getElementById('reportForm').addEventListener('submit', async function(event) {
     event.preventDefault();
+    const user = auth.currentUser;
+    if (!user) return;
 
     const form = event.target;
     const statusDiv = document.getElementById('formStatus');
-    statusDiv.textContent = 'Отправка...';
+    statusDiv.textContent = 'Сохранение...';
     statusDiv.className = 'form-status';
 
-    // Собираем данные
     const formData = {
         reporting: form.reporting.value,
         issuedBy: form.issuedBy.value,
@@ -22,58 +43,42 @@ document.getElementById('reportForm').addEventListener('submit', async function(
         reportDate: form.reportDate.value,
     };
 
-    // --- ШАГ 1: УДАЛЕНИЕ СТАРОГО РАПОРТА (ТОЛЬКО ПРИ ИСПРАВЛЕНИИ) ---
-    if (formData.reportType === 'ИСПРАВЛЕНИЕ') {
-        const lastMessageId = localStorage.getItem(STORAGE_KEY);
-        if (lastMessageId) {
-            statusDiv.textContent = 'Удаление предыдущего рапорта...';
-            try {
-                const deleteUrl = `${DISCORD_WEBHOOK_URL}/messages/${lastMessageId}`;
-                await fetch(deleteUrl, { method: 'DELETE' });
-                localStorage.removeItem(STORAGE_KEY);
-            } catch (error) {
-                console.error('Ошибка при удалении:', error);
-            }
-        }
-    }
-
-    // --- ШАГ 2: ФОРМИРОВАНИЕ НОВОГО РАПОРТА ---
-    const isCorrection = formData.reportType === 'ИСПРАВЛЕНИЕ';
-
-    const payload = {
-        username: "Канцелярия 41-го ЭРК",
-        avatar_url: "https://i.imgur.com/your-logo.png", // Логотип бота
-        embeds: [{
-            title: isCorrection ? "📝 ИСПРАВЛЕНИЕ РАПОРТА." : "📝 Рапорт о изменении звания.",
-            color: 9109504, // Темно-красный цвет
-            description: "📌 **Основные данные**",
-            
-            // ИЗМЕНЕНИЕ ЗДЕСЬ: Вместо image используем thumbnail для картинки справа
-            thumbnail: {
-                url: "https://raw.githubusercontent.com/Kaktysini/raportovanie41/refs/heads/main/image.png" // Ссылка на вашу картинку
-            },
-            
-            fields: [
-                { name: "Докладывает:", value: `\`${formData.reporting}\``, inline: false },
-                { name: "Кто выдал форму:", value: `\`${formData.issuedBy}\``, inline: false },
-                { name: "Тип рапорта:", value: `**${formData.reportType}**`, inline: false },
-                { name: "Н | П бойца:", value: `${formData.soldierInfo}`, inline: false },
-                { name: "Изменение звания:", value: `~~${formData.oldRank}~~ ➔ **${formData.newRank}**`, inline: false },
-                { name: "SteamID:", value: `\`${formData.steamId}\``, inline: false },
-                { name: "Дата рапорта:", value: `${formData.reportDate}`, inline: false }
-            ],
-            footer: {
-                text: "Портал служебных рапортов 41-го ЭРК"
-            },
-            timestamp: new Date().toISOString()
-        }]
-    };
+    // Ставим срок жизни: ровно 7 дней от текущего момента
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + 7);
 
     try {
-        statusDiv.textContent = 'Отправка нового рапорта...';
+        // 1. Сохраняем в базу данных
+        const docRef = await db.collection('reports').add({
+            ...formData,
+            userId: user.uid, 
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            expires_at: firebase.firestore.Timestamp.fromDate(expiresAt)
+        });
 
-        const postUrl = `${DISCORD_WEBHOOK_URL}?wait=true`;
-        const response = await fetch(postUrl, {
+        statusDiv.textContent = 'Отправка в Discord...';
+
+        // 2. Отправляем в Discord
+        const payload = {
+            username: "Канцелярия 41-го ЭРК",
+            embeds: [{
+                title: "📝 Рапорт о изменении звания.",
+                color: 9109504,
+                description: "📌 **Основные данные**",
+                fields: [
+                    { name: "Докладывает:", value: `\`${formData.reporting}\``, inline: false },
+                    { name: "Кто выдал форму:", value: `\`${formData.issuedBy}\``, inline: false },
+                    { name: "Тип рапорта:", value: `**${formData.reportType}**`, inline: false },
+                    { name: "Н | П бойца:", value: `${formData.soldierInfo}`, inline: false },
+                    { name: "Изменение звания:", value: `~~${formData.oldRank}~~ ➔ **${formData.newRank}**`, inline: false },
+                    { name: "SteamID:", value: `\`${formData.steamId}\``, inline: false },
+                    { name: "Дата рапорта:", value: `${formData.reportDate}`, inline: false }
+                ],
+                timestamp: new Date().toISOString()
+            }]
+        };
+
+        const response = await fetch(`${DISCORD_WEBHOOK_URL}?wait=true`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
@@ -81,17 +86,15 @@ document.getElementById('reportForm').addEventListener('submit', async function(
 
         if (response.ok) {
             const createdMessage = await response.json();
-            if (createdMessage.id) {
-                localStorage.setItem(STORAGE_KEY, createdMessage.id);
-            }
-            statusDiv.textContent = 'Рапорт успешно отправлен!';
+            // 3. Запоминаем ID сообщения Discord в базе (чтобы потом можно было изменить)
+            await docRef.update({ discordMessageId: createdMessage.id });
+
+            statusDiv.textContent = 'Рапорт отправлен и сохранен!';
             statusDiv.classList.add('success');
             form.reset();
-        } else {
-            throw new Error('Ошибка при отправке в Discord');
         }
     } catch (error) {
-        statusDiv.textContent = `Не удалось отправить рапорт: ${error.message}`;
+        statusDiv.textContent = 'Ошибка: ' + error.message;
         statusDiv.classList.add('error');
     }
 });
