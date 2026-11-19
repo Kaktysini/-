@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Мои рапорты | 41-й ЭРК</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="logo-container">
+            <h1>41-Й ЭЛИТНЫЙ РАЗВЕДЫВАТЕЛЬНЫЙ КОРПУС</h1>
+            <p>ЛИЧНЫЙ КАБИНЕТ БОЙЦА</p>
+        </div>
+    </header>
+
+    <main class="report-form-container">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2>Ваши рапорты (активны 7 дней)</h2>
+            <a href="index.html" style="color: #4caf50; text-decoration: none;">← Подать новый</a>
+        </div>
+        
+        <div id="reportsList">
+            <p>Загрузка данных...</p>
+        </div>
+    </main>
+
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
+    <script src="edit.js"></script>
+</body>
+</html>
