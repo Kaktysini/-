@@ -1,6 +1,6 @@
 // ВСТАВЬТЕ ВАШИ КЛЮЧИ ИЗ FIREBASE СЮДА (между кавычками)
 const firebaseConfig = {
-    apiKey: "AIzaSyAOp...", // <- Ваш ключ
+    apiKey: "AIzaSyAOOP79OWQn_RjiI5bFk28a_At6jJ9o6qU", // <- Ваш ключ
     authDomain: "raportovanie-41.firebaseapp.com",
     projectId: "raportovanie-41",
     storageBucket: "raportovanie-41.appspot.com",
