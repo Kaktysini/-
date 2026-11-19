@@ -10,6 +10,8 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
+// Это заставит Firebase забывать пользователя, как только он закроет браузер/вкладку.
+auth.setPersistence(firebase.auth.Auth.Persistence.SESSION); 
 let isLoginMode = true; 
 
 document.getElementById('toggleAuthBtn').addEventListener('click', () => {
