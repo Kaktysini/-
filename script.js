@@ -1,19 +1,19 @@
-// 🔴 ВСТАВЬТЕ ВАШИ КЛЮЧИ ИЗ FIREBASE СЮДА 🔴
+// ВСТАВЬТЕ ВАШИ КЛЮЧИ ИЗ FIREBASE СЮДА (между кавычками)
 const firebaseConfig = {
-    apiKey: "AIzaSyAOOP79OWQn_RjiI5bFk28a_At6jJ9o6qU",
+    apiKey: "AIzaSyAOp...", // <- Ваш ключ
     authDomain: "raportovanie-41.firebaseapp.com",
     projectId: "raportovanie-41",
     storageBucket: "raportovanie-41.appspot.com",
-    messagingSenderId: "1097924602121",
-    appId: "1:1097924602121:web:90662309434c46ced9cbd8"
+    messagingSenderId: "1097924602121", // <- Ваш ID
+    appId: "1:1097924602121:web:9066230943a4c6c9dcb8" // <- Ваш ID приложения
 };
-// 🔴 КОНЕЦ ВСТАВКИ 🔴
 
+// Инициализация Firebase (НЕ ПЕРЕВОДИТЬ!)
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-// Ваш вебхук (оставил ваш тестовый)
+// Ваш вебхук
 const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1571627519638114334/Lg_zk96gkUTrxQBCAm7giIxoIqIySg8GpTGZtdgTuOSJsp1K1G5Crd_prZ4U_xgy91_G';
 
 // Проверка: если не вошел — кидаем на страницу логина
@@ -42,7 +42,6 @@ document.getElementById('reportForm').addEventListener('submit', async function(
         reportDate: form.reportDate.value,
     };
 
-    // Ставим срок жизни: ровно 7 дней от текущего момента
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 7);
 
@@ -85,7 +84,7 @@ document.getElementById('reportForm').addEventListener('submit', async function(
 
         if (response.ok) {
             const createdMessage = await response.json();
-            // 3. Запоминаем ID сообщения Discord в базе (чтобы потом можно было изменить)
+            // 3. Запоминаем ID сообщения Discord в базе
             await docRef.update({ discordMessageId: createdMessage.id });
 
             statusDiv.textContent = 'Рапорт отправлен и сохранен!';
