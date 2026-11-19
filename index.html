@@ -13,7 +13,6 @@
             <p>ПОРТАЛ СЛУЖЕБНЫХ РАПОРТОВ</p>
             <div style="margin-top: 10px;">
                 <a href="edit.html" style="color: #4caf50; text-decoration: none; font-size: 14px; margin-right: 15px;">Мои рапорты ➔</a>
-                <!-- НОВАЯ КНОПКА ВЫХОДА -->
                 <button id="logoutBtn" style="background: none; border: 1px solid #ef4444; color: #ef4444; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 14px;">Выйти</button>
             </div>
         </div>
@@ -21,7 +20,7 @@
 
     <main class="report-form-container">
         <div class="form-header">
-            <h2>Рапорт об изменении звания</h2>
+            <h2>Новый рапорт об изменении звания</h2>
             <p>Резервная система. Данные уходят напрямую в Канцелярию.</p>
         </div>
 
@@ -35,14 +34,6 @@
                 <div class="form-group">
                     <label for="issuedBy">Кто выдал форму *</label>
                     <input type="text" id="issuedBy" name="issuedBy" placeholder="Номер | Позывной | Звание" required>
-                </div>
-
-                <div class="form-group full-width">
-                    <label for="reportType">Тип рапорта *</label>
-                    <select id="reportType" name="reportType" required>
-                        <option value="Вступление в 41-й">Вступление в 41-й</option>
-                        <option value="ИСПРАВЛЕНИЕ">ИСПРАВЛЕНИЕ (удалить старое и отправить новое)</option>
-                    </select>
                 </div>
 
                 <div class="form-group">
