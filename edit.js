@@ -101,3 +101,14 @@ window.editReport = async function(reportId) {
         alert('Ошибка: ' + error.message);
     }
 };
+// Логика кнопки "Выйти" (ВСТАВЛЕННЫЙ КОД)
+const logoutBtn = document.getElementById('logoutBtn');
+if (logoutBtn) {
+    logoutBtn.addEventListener('click', () => {
+        auth.signOut().then(() => {
+            window.location.href = 'login.html'; // Перенаправляем на вход
+        }).catch((error) => {
+            console.error('Ошибка при выходе:', error);
+        });
+    });
+}
