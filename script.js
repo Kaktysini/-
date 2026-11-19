@@ -1,10 +1,10 @@
 const firebaseConfig = {
-    apiKey: "AIzaSyAOOP79OWQn_RjiI5bFk28a_At6jJ9o6qU",
-    authDomain: "raportovanie-41.firebaseapp.com",
-    projectId: "raportovanie-41",
-    storageBucket: "raportovanie-41.appspot.com",
-    messagingSenderId: "1097924602121",
-    appId: "1:1097924602121:web:90662309434c46ced9cbd8"
+  apiKey: "AIzaSyAOOP79OWQn_RjiI5bFk28a_At6jJ9o6qU",
+  authDomain: "raportovanie-41.firebaseapp.com",
+  projectId: "raportovanie-41",
+  storageBucket: "raportovanie-41.appspot.com",
+  messagingSenderId: "1097924602121",
+  appId: "1:1097924602121:web:90662309434c46ced9cbd8"
 };
 
 firebase.initializeApp(firebaseConfig);
