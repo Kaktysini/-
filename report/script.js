@@ -12,12 +12,11 @@ const auth = firebase.auth();
 const db = firebase.firestore();
 const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1571627519638114334/Lg_zk96gkUTrxQBCAm7giIxoIqIySg8GpTGZtdgTuOSJsp1K1G5Crd_prZ4U_xgy91_G';
 
-// ИСПРАВЛЕНО: Добавлена задержка, чтобы Firebase успел найти вашу сессию
 auth.onAuthStateChanged((user) => {
     if (!user) {
         setTimeout(() => {
             if (!auth.currentUser) window.location.href = '../login/login.html';
-        }, 1000); // Ждем 1 секунду перед тем, как выкинуть
+        }, 1000);
     }
 });
 
@@ -28,6 +27,12 @@ document.getElementById('reportForm').addEventListener('submit', async function(
 
     const form = event.target;
     const statusDiv = document.getElementById('formStatus');
+    const submitBtn = form.querySelector('.btn-submit'); // Находим кнопку
+
+    // ВКЛЮЧАЕМ АНИМАЦИЮ И БЛОКИРУЕМ КНОПКУ
+    submitBtn.classList.add('loading');
+    submitBtn.disabled = true; 
+    
     statusDiv.textContent = 'Создание рапорта...';
     statusDiv.className = 'form-status';
 
@@ -82,6 +87,7 @@ document.getElementById('reportForm').addEventListener('submit', async function(
         if (response.ok) {
             const createdMessage = await response.json();
             await docRef.update({ discordMessageId: createdMessage.id });
+            
             statusDiv.textContent = 'Рапорт успешно отправлен!';
             statusDiv.classList.add('success');
             form.reset();
@@ -89,6 +95,10 @@ document.getElementById('reportForm').addEventListener('submit', async function(
     } catch (error) {
         statusDiv.textContent = 'Ошибка: ' + error.message;
         statusDiv.classList.add('error');
+    } finally {
+        // ВЫКЛЮЧАЕМ АНИМАЦИЮ И РАЗБЛОКИРУЕМ КНОПКУ В ЛЮБОМ СЛУЧАЕ (успех или ошибка)
+        submitBtn.classList.remove('loading');
+        submitBtn.disabled = false;
     }
 });
 
