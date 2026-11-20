@@ -27,11 +27,11 @@
         <!-- Меню с карточками -->
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 30px;">
             
-            <!-- Карточка: Подать рапорт -->
-            <a href="../report/index.html" class="menu-card">
+            <!-- Карточка: Подать рапорт (теперь открывает окно) -->
+            <div class="menu-card" onclick="openFormModal()" style="cursor: pointer;">
                 <h3>📝 Подать рапорт</h3>
-                <p>Создать новый рапорт об изменении звания.</p>
-            </a>
+                <p>Создать новый рапорт (выбор формы).</p>
+            </div>
 
             <!-- Карточка: Мои рапорта -->
             <a href="../edit/edit.html" class="menu-card">
@@ -39,12 +39,11 @@
                 <p>Просмотр и редактирование активных рапортов.</p>
             </a>
 
-            <!-- Заглушка для будущих интеграций -->
+            <!-- Заглушки -->
             <div class="menu-card" style="opacity: 0.5; cursor: not-allowed;">
                 <h3>⚙️ Другие формы</h3>
                 <p>Раздел в разработке.</p>
             </div>
-            
             <div class="menu-card" style="opacity: 0.5; cursor: not-allowed;">
                 <h3>📊 Статистика</h3>
                 <p>Раздел в разработке.</p>
@@ -52,6 +51,32 @@
 
         </div>
     </main>
+
+    <!-- МОДАЛЬНОЕ ОКНО ВЫБОРА ФОРМЫ -->
+    <div id="formModal" class="modal-overlay">
+        <div class="modal-content">
+            <h2 style="margin-top:0; color: #f3f4f6;">Выберите форму рапорта</h2>
+            <p style="color: #9ca3af; margin-bottom: 20px;">Доступные бланки для заполнения:</p>
+            
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <!-- ФОРМА 1 (Уже существует) -->
+                <a href="../report/index.html" class="form-select-btn">
+                    📄 Рапорт об изменении звания
+                </a>
+
+                <!-- ЗАГЛУШКА ДЛЯ БУДУЩЕЙ ФОРМЫ 2 -->
+                <!-- В будущем просто раскомментируйте и поменяйте ссылку -->
+                <!-- <a href="../forms/nakazanie.html" class="form-select-btn">📄 Рапорт о наказании</a> -->
+
+                <!-- ЗАГЛУШКА ДЛЯ БУДУЩЕЙ ФОРМЫ 3 -->
+                <!-- <a href="../forms/perevod.html" class="form-select-btn">📄 Рапорт о переводе</a> -->
+            </div>
+
+            <div class="form-actions" style="margin-top: 25px; border-top: none; padding-top: 0;">
+                <button type="button" class="btn-reset" onclick="closeFormModal()" style="width: 100%;">ЗАКРЫТЬ</button>
+            </div>
+        </div>
+    </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
