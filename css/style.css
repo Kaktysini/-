@@ -126,34 +126,81 @@ body {
     padding-top: 25px;
 }
 
-.form-actions button {
-    padding: 14px 20px;
-    font-size: 0.95em;
-    font-weight: bold;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.2s ease;
+/* --- АНИМИРОВАННЫЕ КНОПКИ --- */
+.form-actions button, .btn-logout, .menu-card {
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    will-change: transform, box-shadow;
 }
 
+/* Эффект нажатия (тактильность) */
+.form-actions button:active, .btn-logout:active, .menu-card:active {
+    transform: scale(0.96) translateY(0);
+}
+
+/* Кнопка ОТПРАВИТЬ */
 .btn-submit {
     background-color: #2f4f2f;
     color: #fff;
     flex-grow: 1;
     border: 1px solid #3e6b3e;
+    padding: 14px 20px;
+    font-size: 0.95em;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-radius: 4px;
+    cursor: pointer;
 }
 
 .btn-submit:hover {
     background-color: #3e6b3e;
-    box-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
+    box-shadow: 0 0 15px rgba(76, 175, 80, 0.4); /* Зеленое свечение */
+    transform: translateY(-3px); /* Поднятие */
 }
 
+/* Кнопка СБРОСИТЬ */
 .btn-reset {
     background-color: transparent;
     color: #9ca3af;
     border: 1px solid #4b5563;
+    padding: 14px 20px;
+    font-size: 0.95em;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btn-reset:hover {
+    background-color: #374151;
+    color: #fff;
+    transform: translateY(-3px);
+}
+
+/* Кнопка ВЫЙТИ (новая) */
+.btn-logout {
+    background: none;
+    border: 1px solid #ef4444;
+    color: #ef4444;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.btn-logout:hover {
+    background-color: rgba(239, 68, 68, 0.1); /* Легкий красный фон */
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.3); /* Красное свечение */
+    transform: translateY(-2px);
+}
+
+/* Улучшенная анимация для карточек в меню */
+.menu-card:hover {
+    border-color: #4caf50;
+    background-color: #151816;
+    transform: translateY(-5px); /* Карточка поднимается выше */
+    box-shadow: 0 8px 20px rgba(76, 175, 80, 0.15); /* Более выраженная тень */
 }
 
 .btn-reset:hover {
