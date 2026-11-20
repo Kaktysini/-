@@ -10,81 +10,114 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
-const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1571627519638114334/Lg_zk96gkUTrxQBCAm7giIxoIqIySg8GpTGZtdgTuOSJsp1K1G5Crd_prZ4U_xgy91_G';
 
-const listDiv = document.getElementById('reportsList');
+const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1571627519638114334/Lg_zk96gkUTrxQBCAm7giIxoIqIySg8GpTGZtdgTuOSJsp1K1G5Crd_prZ4U_xgy91_G';
+const PROMOTION_WEBHOOK_URL = 'ССЫЛКА_НА_ВАШ_НОВЫЙ_ВЕБХУК'; // Не забудьте вставить сюда ваш 2-й вебхук!
+
+const rankChangeList = document.getElementById('rankChangeList');
+const promotionList = document.getElementById('promotionList');
 
 auth.onAuthStateChanged((user) => {
     if (user) {
         loadReports(user);
     } else {
         setTimeout(() => {
-            // ИЗМЕНЕНО: Путь к странице входа
             if (!auth.currentUser) window.location.href = '../login/login.html';
         }, 1000);
     }
 });
 
 async function loadReports(user) {
-    listDiv.innerHTML = 'Поиск...';
+    rankChangeList.innerHTML = 'Поиск...';
+    promotionList.innerHTML = 'Поиск...';
+
     try {
         const snapshot = await db.collection('reports').where('userId', '==', user.uid).get();
-        listDiv.innerHTML = '';
+        
+        rankChangeList.innerHTML = '';
+        promotionList.innerHTML = '';
+        
         const now = new Date();
-        let count = 0;
+        let hasRank = false;
+        let hasPromo = false;
 
-                snapshot.forEach(doc => {
+        snapshot.forEach(doc => {
             const data = doc.data();
+            
+            // Проверяем срок
             if (data.expires_at && data.expires_at.toDate() > now) {
-                count++;
+                // Создаем карточку
                 const card = document.createElement('div');
                 card.style.cssText = 'border: 1px solid #374151; padding: 15px; margin-bottom: 15px; background-color: #1a1e1b; border-radius: 4px;';
                 
-                // Проверяем тип рапорта
+                const safeData = JSON.stringify(data).replace(/'/g, "&#39;");
+                const btnHTML = `<button class="btn-submit" style="margin-top: 10px; padding: 8px 15px; font-size: 14px;" onclick='openModal("${doc.id}", ${safeData})'>Редактировать</button>`;
+
+                // Сортируем по спискам
                 if (data.formType === "Запрос на повышение") {
+                    hasPromo = true;
                     card.innerHTML = `
-                        <p><strong>Тип:</strong> Запрос на повышение</p>
                         <p><strong>Докладывает:</strong> ${data.reporting}</p>
                         <p><strong>Запрос:</strong> ${data.requestedRank}</p>
-                        <button class="btn-submit" style="margin-top: 10px; padding: 8px 15px; font-size: 14px;" 
-                            onclick='openModal("${doc.id}", ${JSON.stringify(data).replace(/'/g, "&#39;")})'>
-                            Редактировать
-                        </button>
+                        ${btnHTML}
                     `;
+                    promotionList.appendChild(card);
                 } else {
-                    // Стандартный рапорт
+                    hasRank = true;
                     card.innerHTML = `
                         <p><strong>Боец:</strong> ${data.soldierInfo}</p>
                         <p><strong>Звание:</strong> ${data.oldRank} ➔ ${data.newRank}</p>
                         <p><strong>Дата:</strong> ${data.reportDate}</p>
-                        <button class="btn-submit" style="margin-top: 10px; padding: 8px 15px; font-size: 14px;" 
-                            onclick='openModal("${doc.id}", ${JSON.stringify(data).replace(/'/g, "&#39;")})'>
-                            Редактировать
-                        </button>
+                        ${btnHTML}
                     `;
+                    rankChangeList.appendChild(card);
                 }
-                listDiv.appendChild(card);
             } else {
-                // Удаление просроченных
+                // Удаляем просроченные
                 doc.ref.delete().catch(err => console.error("Ошибка удаления:", err));
             }
         });
 
-        if (count === 0) listDiv.innerHTML = '<p>У вас нет активных рапортов.</p>';
+        if (!hasRank) rankChangeList.innerHTML = '<p>У вас нет активных рапортов этого типа.</p>';
+        if (!hasPromo) promotionList.innerHTML = '<p>У вас нет активных рапортов этого типа.</p>';
+
     } catch (error) {
-        listDiv.innerHTML = `<p style="color: red;">Ошибка: ${error.message}</p>`;
+        rankChangeList.innerHTML = `<p style="color: red;">Ошибка: ${error.message}</p>`;
+        promotionList.innerHTML = '';
     }
 }
 
+// Открытие модального окна с адаптацией под форму
 window.openModal = function(docId, data) {
     document.getElementById('editDocId').value = docId;
+    document.getElementById('editFormType').value = data.formType || "Новый рапорт";
+    
+    // Заполняем общие поля
     document.getElementById('editReporting').value = data.reporting || '';
-    document.getElementById('editIssuedBy').value = data.issuedBy || '';
-    document.getElementById('editSoldierInfo').value = data.soldierInfo || '';
-    document.getElementById('editSteamId').value = data.steamId || '';
-    document.getElementById('editOldRank').value = data.oldRank || '';
-    document.getElementById('editNewRank').value = data.newRank || '';
-    document.getElementById('editReportDate').value = data.reportDate || '';
+
+    const groupRank = document.getElementById('group-rank');
+    const groupPromo = document.getElementById('group-promotion');
+    const modalTitle = document.getElementById('modalTitle');
+
+    if (data.formType === "Запрос на повышение") {
+        // Настраиваем окно под запрос на повышение
+        modalTitle.textContent = "Редактирование запроса на повышение";
+        groupRank.style.display = 'none'; // Скрываем лишние поля
+        groupPromo.style.display = 'block'; // Показываем нужное
+        
+        document.getElementById('editRequestedRank').value = data.requestedRank || '';
+    } else {
+        // Настраиваем окно под обычный рапорт
+        modalTitle.textContent = "Редактирование рапорта";
+        groupRank.style.display = 'block';
+        groupPromo.style.display = 'none';
+        
+        document.getElementById('editIssuedBy').value = data.issuedBy || '';
+        document.getElementById('editSoldierInfo').value = data.soldierInfo || '';
+        document.getElementById('editSteamId').value = data.steamId || '';
+        document.getElementById('editOldRank').value = data.oldRank || '';
+        document.getElementById('editNewRank').value = data.newRank || '';
+    }
     
     document.getElementById('editModal').style.display = 'flex';
 }
@@ -93,19 +126,53 @@ window.closeModal = function() {
     document.getElementById('editModal').style.display = 'none';
 }
 
+// Сохранение изменений
 document.getElementById('editForm').addEventListener('submit', async function(event) {
     event.preventDefault();
     const docId = document.getElementById('editDocId').value;
+    const formType = document.getElementById('editFormType').value;
     
-    const updatedData = {
-        reporting: document.getElementById('editReporting').value,
-        issuedBy: document.getElementById('editIssuedBy').value,
-        soldierInfo: document.getElementById('editSoldierInfo').value,
-        steamId: document.getElementById('editSteamId').value,
-        oldRank: document.getElementById('editOldRank').value,
-        newRank: document.getElementById('editNewRank').value,
-        reportDate: document.getElementById('editReportDate').value
-    };
+    let updatedData = { reporting: document.getElementById('editReporting').value };
+    let payload = {};
+
+    if (formType === "Запрос на повышение") {
+        updatedData.requestedRank = document.getElementById('editRequestedRank').value;
+        
+        // Шаблон для Discord (Запрос)
+        payload = {
+            embeds: [{
+                title: "Форма рапорта запроса на проверку готовности к повышению (ИЗМЕНЕНО)",
+                color: 9109504,
+                fields: [
+                    { name: "Докладывает:", value: `\`${updatedData.reporting}\``, inline: false },
+                    { name: "Запрашиваю проверку на повышение в звании", value: `**${updatedData.requestedRank}**`, inline: false }
+                ],
+                timestamp: new Date().toISOString()
+            }]
+        };
+    } else {
+        updatedData.issuedBy = document.getElementById('editIssuedBy').value;
+        updatedData.soldierInfo = document.getElementById('editSoldierInfo').value;
+        updatedData.steamId = document.getElementById('editSteamId').value;
+        updatedData.oldRank = document.getElementById('editOldRank').value;
+        updatedData.newRank = document.getElementById('editNewRank').value;
+        
+        // Шаблон для Discord (Изменение звания)
+        payload = {
+            embeds: [{
+                title: "📝 РАПОРТ (Отредактировано бойцом)",
+                color: 9109504,
+                fields: [
+                    { name: "Докладывает:", value: `\`${updatedData.reporting}\``, inline: false },
+                    { name: "Кто выдал форму:", value: `\`${updatedData.issuedBy}\``, inline: false },
+                    { name: "Н | П бойца:", value: `${updatedData.soldierInfo}`, inline: false },
+                    { name: "Изменение звания:", value: `~~${updatedData.oldRank}~~ ➔ **${updatedData.newRank}**`, inline: false },
+                    { name: "SteamID:", value: `\`${updatedData.steamId}\``, inline: false }
+                ],
+                timestamp: new Date().toISOString()
+            }]
+        };
+    }
 
     try {
         const docRef = db.collection('reports').doc(docId);
@@ -115,30 +182,17 @@ document.getElementById('editForm').addEventListener('submit', async function(ev
         const messageId = docSnap.data().discordMessageId;
         
         if (messageId) {
-            const payload = {
-                embeds: [{
-                    title: "📝 РАПОРТ (Отредактировано бойцом)",
-                    color: 9109504,
-                    fields: [
-                        { name: "Докладывает:", value: `\`${updatedData.reporting}\``, inline: false },
-                        { name: "Кто выдал форму:", value: `\`${updatedData.issuedBy}\``, inline: false },
-                        { name: "Н | П бойца:", value: `${updatedData.soldierInfo}`, inline: false },
-                        { name: "Изменение звания:", value: `~~${updatedData.oldRank}~~ ➔ **${updatedData.newRank}**`, inline: false },
-                        { name: "SteamID:", value: `\`${updatedData.steamId}\``, inline: false },
-                        { name: "Дата рапорта:", value: `${updatedData.reportDate}`, inline: false }
-                    ],
-                    timestamp: new Date().toISOString()
-                }]
-            };
+            // Выбираем правильный вебхук в зависимости от типа
+            const webhookUrl = (formType === "Запрос на повышение") ? PROMOTION_WEBHOOK_URL : DISCORD_WEBHOOK_URL;
 
-            await fetch(`${DISCORD_WEBHOOK_URL}/messages/${messageId}`, {
+            await fetch(`${webhookUrl}/messages/${messageId}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             });
         }
         
-        alert('Рапорт успешно обновлен!');
+        alert('Запись успешно обновлена!');
         closeModal();
         window.location.reload();
     } catch (error) {
@@ -149,7 +203,6 @@ document.getElementById('editForm').addEventListener('submit', async function(ev
 const logoutBtn = document.getElementById('logoutBtn');
 if (logoutBtn) {
     logoutBtn.addEventListener('click', () => {
-        // ИЗМЕНЕНО: Путь к странице входа
         auth.signOut().then(() => window.location.href = '../login/login.html');
     });
 }
