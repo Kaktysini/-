@@ -38,7 +38,7 @@ document.getElementById('authForm').addEventListener('submit', async (e) => {
             await auth.createUserWithEmailAndPassword(fakeEmail, password);
         }
         // ИЗМЕНЕНО: Выходим из login и заходим в report
-        window.location.href = '../report/index.html'; 
+        window.location.href = '../dashboard/index.html';
     } catch (error) {
         if (error.code === 'auth/user-not-found') statusDiv.textContent = 'Боец не найден.';
         else if (error.code === 'auth/wrong-password') statusDiv.textContent = 'Неверный пароль.';
