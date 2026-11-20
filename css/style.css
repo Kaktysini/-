@@ -198,3 +198,33 @@ body {
         width: 95%;
     }
 }
+/* Стили для карточек главного меню */
+.menu-card {
+    display: block;
+    background-color: #111312;
+    border: 1px solid #374151;
+    border-radius: 4px;
+    padding: 20px;
+    text-decoration: none;
+    color: #d1d5db;
+    transition: all 0.2s ease;
+}
+
+.menu-card:hover {
+    border-color: #4caf50;
+    background-color: #151816;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.1);
+}
+
+.menu-card h3 {
+    margin-top: 0;
+    color: #f3f4f6;
+    font-size: 1.2em;
+}
+
+.menu-card p {
+    margin-bottom: 0;
+    font-size: 0.9em;
+    color: #9ca3af;
+}
