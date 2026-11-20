@@ -12,9 +12,13 @@ const auth = firebase.auth();
 const db = firebase.firestore();
 const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1571627519638114334/Lg_zk96gkUTrxQBCAm7giIxoIqIySg8GpTGZtdgTuOSJsp1K1G5Crd_prZ4U_xgy91_G';
 
+// ИСПРАВЛЕНО: Добавлена задержка, чтобы Firebase успел найти вашу сессию
 auth.onAuthStateChanged((user) => {
-    // ИЗМЕНЕНО: Путь к странице входа
-    if (!user) window.location.href = '../login/login.html';
+    if (!user) {
+        setTimeout(() => {
+            if (!auth.currentUser) window.location.href = '../login/login.html';
+        }, 1000); // Ждем 1 секунду перед тем, как выкинуть
+    }
 });
 
 document.getElementById('reportForm').addEventListener('submit', async function(event) {
@@ -91,7 +95,6 @@ document.getElementById('reportForm').addEventListener('submit', async function(
 const logoutBtn = document.getElementById('logoutBtn');
 if (logoutBtn) {
     logoutBtn.addEventListener('click', () => {
-        // ИЗМЕНЕНО: Путь к странице входа при выходе
         auth.signOut().then(() => window.location.href = '../login/login.html');
     });
 }
