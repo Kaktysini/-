@@ -33,22 +33,40 @@ async function loadReports(user) {
         const now = new Date();
         let count = 0;
 
-        snapshot.forEach(doc => {
+                snapshot.forEach(doc => {
             const data = doc.data();
             if (data.expires_at && data.expires_at.toDate() > now) {
                 count++;
                 const card = document.createElement('div');
                 card.style.cssText = 'border: 1px solid #374151; padding: 15px; margin-bottom: 15px; background-color: #1a1e1b; border-radius: 4px;';
-                card.innerHTML = `
-                    <p><strong>Боец:</strong> ${data.soldierInfo}</p>
-                    <p><strong>Звание:</strong> ${data.oldRank} ➔ ${data.newRank}</p>
-                    <p><strong>Дата:</strong> ${data.reportDate}</p>
-                    <button class="btn-submit" style="margin-top: 10px; padding: 8px 15px; font-size: 14px;" 
-                        onclick='openModal("${doc.id}", ${JSON.stringify(data).replace(/'/g, "&#39;")})'>
-                        Редактировать
-                    </button>
-                `;
+                
+                // Проверяем тип рапорта
+                if (data.formType === "Запрос на повышение") {
+                    card.innerHTML = `
+                        <p><strong>Тип:</strong> Запрос на повышение</p>
+                        <p><strong>Докладывает:</strong> ${data.reporting}</p>
+                        <p><strong>Запрос:</strong> ${data.requestedRank}</p>
+                        <button class="btn-submit" style="margin-top: 10px; padding: 8px 15px; font-size: 14px;" 
+                            onclick='openModal("${doc.id}", ${JSON.stringify(data).replace(/'/g, "&#39;")})'>
+                            Редактировать
+                        </button>
+                    `;
+                } else {
+                    // Стандартный рапорт
+                    card.innerHTML = `
+                        <p><strong>Боец:</strong> ${data.soldierInfo}</p>
+                        <p><strong>Звание:</strong> ${data.oldRank} ➔ ${data.newRank}</p>
+                        <p><strong>Дата:</strong> ${data.reportDate}</p>
+                        <button class="btn-submit" style="margin-top: 10px; padding: 8px 15px; font-size: 14px;" 
+                            onclick='openModal("${doc.id}", ${JSON.stringify(data).replace(/'/g, "&#39;")})'>
+                            Редактировать
+                        </button>
+                    `;
+                }
                 listDiv.appendChild(card);
+            } else {
+                // Удаление просроченных
+                doc.ref.delete().catch(err => console.error("Ошибка удаления:", err));
             }
         });
 
