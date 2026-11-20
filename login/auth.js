@@ -37,13 +37,28 @@ document.getElementById('authForm').addEventListener('submit', async (e) => {
         } else {
             await auth.createUserWithEmailAndPassword(fakeEmail, password);
         }
-        // ИЗМЕНЕНО: Выходим из login и заходим в report
         window.location.href = '../dashboard/index.html';
     } catch (error) {
-        if (error.code === 'auth/user-not-found') statusDiv.textContent = 'Боец не найден.';
-        else if (error.code === 'auth/wrong-password') statusDiv.textContent = 'Неверный пароль.';
-        else if (error.code === 'auth/email-already-in-use') statusDiv.textContent = 'Номер уже занят.';
-        else statusDiv.textContent = 'Ошибка: ' + error.message;
+        // ИСПРАВЛЕНО: Добавлена проверка на новую ошибку Firebase
+        if (error.code === 'auth/invalid-login-credentials' || error.code === 'auth/invalid-credential') {
+            statusDiv.textContent = 'Данного пользователя нет в базе данных (или введен неверный пароль).';
+        } 
+        else if (error.code === 'auth/user-not-found') {
+            statusDiv.textContent = 'Данного пользователя нет в базе данных.';
+        } 
+        else if (error.code === 'auth/wrong-password') {
+            statusDiv.textContent = 'Неверный пароль.';
+        } 
+        else if (error.code === 'auth/email-already-in-use') {
+            statusDiv.textContent = 'Этот номер уже зарегистрирован.';
+        } 
+        else if (error.code === 'auth/weak-password') {
+            statusDiv.textContent = 'Пароль должен быть минимум 6 символов.';
+        } 
+        else {
+            statusDiv.textContent = 'Ошибка: ' + error.message;
+        }
+        
         statusDiv.classList.add('error');
     }
 });
