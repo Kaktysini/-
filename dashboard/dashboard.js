@@ -13,12 +13,28 @@ const auth = firebase.auth();
 // Слушаем состояние авторизации
 auth.onAuthStateChanged((user) => {
     if (user) {
-        // Если пользователь вошел, достаем его номер из "почты" (до символа @)
         const soldierNumber = user.email.split('@')[0];
         document.getElementById('profileNumber').textContent = `Боец № ${soldierNumber}`;
     } else {
-        // Если не вошел - на страницу логина
-        window.location.href = '../login/login.html';
+        setTimeout(() => {
+            if (!auth.currentUser) window.location.href = '../login/login.html';
+        }, 1000);
+    }
+});
+
+// Управление модальным окном выбора формы
+window.openFormModal = function() {
+    document.getElementById('formModal').style.display = 'flex';
+}
+
+window.closeFormModal = function() {
+    document.getElementById('formModal').style.display = 'none';
+}
+
+// Закрытие окна при клике вне его области (на темный фон)
+document.getElementById('formModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeFormModal();
     }
 });
 
