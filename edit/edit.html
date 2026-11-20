@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Мои рапорты | 41-й ЭРК</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center;
+        }
+        .modal-content {
+            background: #1e221f; padding: 20px; border-radius: 4px; border: 1px solid #374151;
+            width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <div class="logo-container">
+            <h1>41-Й ЭЛИТНЫЙ РАЗВЕДЫВАТЕЛЬНЫЙ КОРПУС</h1>
+            <p>ЛИЧНЫЙ КАБИНЕТ БОЙЦА</p>
+            <div style="margin-top: 10px;">
+                <!-- ИЗМЕНЕНО: Выходим из edit и заходим в report -->
+                <a href="../report/index.html" style="color: #4caf50; text-decoration: none; font-size: 14px; margin-right: 15px;">← Подать новый рапорт</a>
+                <button id="logoutBtn" style="background: none; border: 1px solid #ef4444; color: #ef4444; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 14px;">Выйти</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="report-form-container">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2>Ваши рапорты (активны 7 дней)</h2>
+        </div>
+        
+        <div id="reportsList">
+            <p>Загрузка данных...</p>
+        </div>
+    </main>
+
+    <!-- МОДАЛЬНОЕ ОКНО ДЛЯ РЕДАКТИРОВАНИЯ -->
+    <div id="editModal" class="modal-overlay">
+        <div class="modal-content">
+            <h2 style="margin-top:0;">Редактирование рапорта</h2>
+            <form id="editForm">
+                <input type="hidden" id="editDocId">
+                <div class="form-group">
+                    <label>Докладывает</label>
+                    <input type="text" id="editReporting" required>
+                </div>
+                <div class="form-group">
+                    <label>Кто выдал форму</label>
+                    <input type="text" id="editIssuedBy" required>
+                </div>
+                <div class="form-group">
+                    <label>Н | П бойца</label>
+                    <input type="text" id="editSoldierInfo" required>
+                </div>
+                <div class="form-group">
+                    <label>SteamID</label>
+                    <input type="text" id="editSteamId" required>
+                </div>
+                <div class="form-group">
+                    <label>Старое звание</label>
+                    <input type="text" id="editOldRank" required>
+                </div>
+                <div class="form-group">
+                    <label>Новое звание</label>
+                    <input type="text" id="editNewRank" required>
+                </div>
+                <div class="form-group">
+                    <label>Дата рапорта</label>
+                    <input type="date" id="editReportDate" required>
+                </div>
+                <div class="form-actions" style="margin-top: 20px;">
+                    <button type="submit" class="btn-submit">СОХРАНИТЬ</button>
+                    <button type="button" class="btn-reset" onclick="closeModal()">ОТМЕНА</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
+    <script src="edit.js"></script>
+</body>
+</html>
