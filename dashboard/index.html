@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Главное меню | 41-й ЭРК</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="logo-container">
+            <h1>41-Й ЭЛИТНЫЙ РАЗВЕДЫВАТЕЛЬНЫЙ КОРПУС</h1>
+            <p>ГЛАВНОЕ МЕНЮ</p>
+        </div>
+    </header>
+
+    <main class="report-form-container">
+        <!-- Блок профиля -->
+        <div class="form-header" style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h2>Добро пожаловать!</h2>
+                <p>Вы вошли как: <strong id="profileNumber" style="color: #4caf50; font-size: 1.2em;">Загрузка...</strong></p>
+            </div>
+            <button id="logoutBtn" style="background: none; border: 1px solid #ef4444; color: #ef4444; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: bold;">ВЫЙТИ</button>
+        </div>
+
+        <!-- Меню с карточками -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 30px;">
+            
+            <!-- Карточка: Подать рапорт -->
+            <a href="../report/index.html" class="menu-card">
+                <h3>📝 Подать рапорт</h3>
+                <p>Создать новый рапорт об изменении звания.</p>
+            </a>
+
+            <!-- Карточка: Мои рапорта -->
+            <a href="../edit/edit.html" class="menu-card">
+                <h3>📂 Мои рапорта</h3>
+                <p>Просмотр и редактирование активных рапортов.</p>
+            </a>
+
+            <!-- Заглушка для будущих интеграций -->
+            <div class="menu-card" style="opacity: 0.5; cursor: not-allowed;">
+                <h3>⚙️ Другие формы</h3>
+                <p>Раздел в разработке.</p>
+            </div>
+            
+            <div class="menu-card" style="opacity: 0.5; cursor: not-allowed;">
+                <h3>📊 Статистика</h3>
+                <p>Раздел в разработке.</p>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
+    <script src="dashboard.js"></script>
+</body>
+</html>
