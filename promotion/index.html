@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Запрос на повышение | 41-й ЭРК</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="logo-container">
+            <h1>41-Й ЭЛИТНЫЙ РАЗВЕДЫВАТЕЛЬНЫЙ КОРПУС</h1>
+            <p>ЗАПРОС НА ПРОВЕРКУ</p>
+            <div style="margin-top: 10px;">
+                <a href="../dashboard/index.html" style="color: #4caf50; text-decoration: none; font-size: 14px; margin-right: 15px;">🏠 Главное меню</a>
+                <button id="logoutBtn" class="btn-logout">Выйти</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="report-form-container">
+        <div class="form-header">
+            <h2>Форма рапорта запроса на проверку готовности к повышению</h2>
+            <p>Резервная система. Данные уходят напрямую в Канцелярию.</p>
+        </div>
+
+        <form id="promotionForm">
+            <div class="form-group">
+                <label for="reporting">Докладывает *</label>
+                <input type="text" id="reporting" name="reporting" placeholder="Номер | Позывной | Звание" required>
+            </div>
+
+            <div class="form-group">
+                <label for="requestedRank">Запрашиваю проверку на повышение в звании *</label>
+                <input type="text" id="requestedRank" name="requestedRank" placeholder="Введите желаемое звание" required>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-submit">ОТПРАВИТЬ ЗАПРОС</button>
+                <button type="reset" class="btn-reset">СБРОСИТЬ</button>
+            </div>
+            
+            <div id="formStatus" class="form-status"></div>
+        </form>
+    </main>
+
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
