@@ -12,7 +12,7 @@ const auth = firebase.auth();
 const db = firebase.firestore();
 
 const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1571627519638114334/Lg_zk96gkUTrxQBCAm7giIxoIqIySg8GpTGZtdgTuOSJsp1K1G5Crd_prZ4U_xgy91_G';
-const PROMOTION_WEBHOOK_URL = 'ССЫЛКА_НА_ВАШ_НОВЫЙ_ВЕБХУК'; // Не забудьте вставить сюда ваш 2-й вебхук!
+const PROMOTION_WEBHOOK_URL = 'https://discord.com/api/webhooks/1531695044057239572/1Ksw1z-Ui2hV-_kTYRpPZPOdPpnd1nFEP-DiUmftq8zfh7hI9vn4XbYiTkUS2ga3G--z'; // Не забудьте вставить сюда ваш 2-й вебхук!
 
 const rankChangeList = document.getElementById('rankChangeList');
 const promotionList = document.getElementById('promotionList');
